@@ -56,7 +56,10 @@ def fix_prefixes(owltext):
     :param owltext: text to change
     :return: text with prefixes mapped
     """
-    return reduce(lambda text, e: re.sub(e[0], e[1], text, flags=re.MULTILINE+re.DOTALL), prefixmaps, owltext)
+    # This could be simplified if we could figure out how to get negative look-aheads to work...
+    def fix_prefix(l):
+        return reduce(lambda text, e: re.sub(e[0], e[1],text), prefixmaps, l)
+    return '\n'.join([l if l.startswith('@prefix') else fix_prefix(l) for l in owltext.split('\n')])
 
 
 def main(args):

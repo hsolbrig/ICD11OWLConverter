@@ -12,6 +12,7 @@ rdflib==4.1.2
 
 It also assumes that a py4j server image is running tha provides access to a modified version of
 [Daniel Karlsson's SNOMEDCTParser](https://github.com/danka74/SnomedCTParser).  The modifications are:
+
 1. A change to the SNOMEDCTOWLParser and SNOMEDCTParsorFactory to allow an external subject URI to be supplied.
 2. An additional package that creates a py4j front end process and initializes a CGToOWL instances
 3. A CGToOWL instances that exposes a parse method that takes a subject and a compositional grammar string and returns

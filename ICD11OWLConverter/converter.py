@@ -34,7 +34,7 @@ import io
 from rdflib import Graph, URIRef
 from functools import reduce
 
-from SCTConverterGateway import SCTConverterGateway
+from ICD11OWLConverter.SCTConverterGateway import SCTConverterGateway
 
 # This is the annotation property that carries the compositional grammar definition
 icdf_comments = URIRef("http://who.int/field/Description.entity.en.Comments")
@@ -58,7 +58,7 @@ def fix_prefixes(owltext):
     """
     # This could be simplified if we could figure out how to get negative look-aheads to work...
     def fix_prefix(l):
-        return reduce(lambda text, e: re.sub(e[0], e[1],text), prefixmaps, l)
+        return reduce(lambda text, e: re.sub(e[0], e[1], text, flags=re.DOTALL), prefixmaps, l)
     return '\n'.join([l if l.startswith('@prefix') else fix_prefix(l) for l in owltext.split('\n')])
 
 
@@ -69,6 +69,7 @@ def main(args):
 
     optparser = argparse.ArgumentParser(description="Generate OWL from Comments in an ICD-11 file")
     optparser.add_argument('owlfile', help="Input OWL file")
+    optparser.add_argument('-f', '--fullydefined', help="Definitions are fully defined", action="store_true")
     optparser.add_argument('-p', '--port', help="SCT Converter gateway port", type=int)
     optparser.add_argument('-o', '--out', help="Output file", required=True)
 
@@ -92,7 +93,7 @@ def main(args):
 
         if cgexpr:
             # Convert the expressions into turtle
-            ttlresult = gw.parse(subj, cgexpr)
+            ttlresult = gw.parse(subj, bool(opts.fullydefined), cgexpr)
             if ttlresult:
                 ttlresult = owlbasere.sub(r'\1>', ttlresult)
                 target_graph.parse(io.StringIO(ttlresult), format='n3')

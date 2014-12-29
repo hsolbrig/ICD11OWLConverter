@@ -34,7 +34,7 @@ import io
 from rdflib import Graph, URIRef
 from functools import reduce
 
-from ICD11OWLConverter.SCTConverterGateway import SCTConverterGateway
+from SCTConverterGateway import SCTConverterGateway
 
 # This is the annotation property that carries the compositional grammar definition
 icdf_comments = URIRef("http://who.int/field/Description.entity.en.Comments")
@@ -72,6 +72,7 @@ def main(args):
     optparser.add_argument('-f', '--fullydefined', help="Definitions are fully defined", action="store_true")
     optparser.add_argument('-p', '--port', help="SCT Converter gateway port", type=int)
     optparser.add_argument('-o', '--out', help="Output file", required=True)
+    optparser.add_argument('-s', '--shorturi', help="Shorten URI's for readability", action="store_true")
 
     opts = optparser.parse_args(args)
 
@@ -80,7 +81,8 @@ def main(args):
     g = Graph()
     target_graph = Graph()
     g.parse(opts.owlfile)
-    target_graph.parse('../data/conversionbase.owl', format='n3')
+    list(target_graph.add(t) for t in g.triples((None, None, None)))
+    # target_graph.parse('../data/conversionbase.owl', format='n3')
 
     # Iterate over the comments with the compositional expressions
     for subj, desc in list(g.subject_objects(icdf_comments)):
@@ -93,7 +95,7 @@ def main(args):
 
         if cgexpr:
             # Convert the expressions into turtle
-            ttlresult = gw.parse(subj, bool(opts.fullydefined), cgexpr)
+            ttlresult = gw.parse(subj, not bool(opts.fullydefined), cgexpr)
             if ttlresult:
                 ttlresult = owlbasere.sub(r'\1>', ttlresult)
                 target_graph.parse(io.StringIO(ttlresult), format='n3')
@@ -102,8 +104,10 @@ def main(args):
         else:
             print("No conversion available for %s (%s)" % (subj, desc), file=sys.stderr)
 
-    target = target_graph.serialize(format='turtle')
-    open(opts.out, 'w').write(fix_prefixes(target.decode('utf-8')))
+    target = target_graph.serialize(format='turtle').decode('utf-8')
+    if opts.shorturi:
+        target = fix_prefixes(target)
+    open(opts.out, 'w').write(target)
 
 
 if __name__ == '__main__':

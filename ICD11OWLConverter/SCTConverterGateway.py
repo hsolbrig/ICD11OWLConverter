@@ -59,7 +59,7 @@ class SCTConverterGateway(object):
         """ (Re)establish the gateway connection
         @return: True if connection was established
         """
-        print("Starting SNOMED CT Converter gateway on port: %s" % self._gwPort)
+        print("Connecting to the compositional grammar gateway on port: %s" % self._gwPort)
         try:
             self._gateway = JavaGateway(GatewayClient(port=self._gwPort))
             self._parser = self._gateway.jvm.org.mayo.parserpy.GatewayParser.parser
@@ -77,6 +77,6 @@ class SCTConverterGateway(object):
         return self._gateway is not None or (reconnect and self.reconnect())
 
     @gwfunction
-    def parse(self, subj, cgstring):
-        rval = self._parser.parse(subj, cgstring)
+    def parse(self, subj, primitive, cgstring):
+        rval = self._parser.cgparse(subj, primitive, cgstring)
         return str(rval) if rval else None

@@ -1,0 +1,28 @@
+@prefix ns1: <http://who.int/field/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+who:1097772105 a owl:Class ;
+    rdfs:label "Rhabdomyosarcoma of cervix uteri"@en ;
+    ns1:Description.entity.en.Comments "Expression (post_coordinated) 302847003 | Rhabdomyosarcoma |: 363698007 | Finding site | = 71252005 | Cervix uteri structure | "@en ;
+    ns1:Description.entity.en.MapType "0/E"@en ;
+    ns1:Description.entity.en.definition """
+"""@en ;
+    ns1:reviewed "false"@en ;
+    rdfs:subClassOf [ a owl:Class ;
+            owl:intersectionOf ( sctid:302847003 [ a owl:Restriction ;
+                        owl:onProperty sctid:363698007 ;
+                        owl:someValuesFrom sctid:71252005 ] ) ],
+        who:800945476 .
+
+<http://who.int/icd/11> a owl:Ontology ;
+    rdfs:label "ICD-11 in OWL RDF" ;
+    rdfs:comment """
+    Generated as OWL RDF/XML from ICD-11 APIs and a PHP script by MITEL
+            """ ;
+    owl:imports <http://snomed.info/sct/900000000000207008> ;
+    owl:versionIRI <http://who.int/icd/11/version/20141130> ;
+    owl:versionInfo "20141130" .

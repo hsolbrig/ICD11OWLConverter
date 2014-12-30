@@ -21,16 +21,11 @@ the translation to OWL
 Usage:
 ======
 1.  Start the converter gateway:
-
     **java -jar javalib/SCTConverter.jar**
+    
 2.  Execute the converter:
-
     **python3 ICD11OWLConverter/converter.py -o {output file} {ICD11 OWL file}**
     
 
-The resulting output will contain the OWL representation of all of the compositional grammar statements contained in
-the OWL file and two import statements:
-
-1.  An import to retrieve the original owl file
-2.  An import to retrieve a SNOMED CT base
+The output file will be a copy of the input file
 

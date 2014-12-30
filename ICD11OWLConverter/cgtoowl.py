@@ -42,6 +42,7 @@ icdf_comments = URIRef("http://who.int/field/Description.entity.en.Comments")
 # CG definitions may include reference url/s following
 cgre1 = re.compile(r'.*Expression (\(pre-coordinated\)|\(post_coordinated\))\s*(.*?)http(s?)://.*$')
 cgre2 = re.compile(r'.*Expression (\(pre-coordinated\)|\(post_coordinated\))\s*(.*)')
+sctidre = re.compile(r'^<http://snomed.info/id/\d+> rdfs:label .*\.')
 
 # The SCTConverter builds an illegal base expression.  This fixes this
 owlbasere = re.compile(r'(^@base <.*)#>', flags=re.MULTILINE)
@@ -73,6 +74,7 @@ def main(args):
     optparser.add_argument('-p', '--port', help="SCT Converter gateway port", type=int)
     optparser.add_argument('-o', '--out', help="Output file", required=True)
     optparser.add_argument('-s', '--shorturi', help="Shorten URI's for readability", action="store_true")
+    optparser.add_argument('-r', '--removesctid', help="Remove the SCT class declarations", action="store_true")
 
     opts = optparser.parse_args(args)
 
@@ -105,6 +107,8 @@ def main(args):
             print("No conversion available for %s (%s)" % (subj, desc), file=sys.stderr)
 
     target = target_graph.serialize(format='turtle').decode('utf-8')
+    if opts.removesctid:
+        target = ('\n'.join([l for l in target.split('\n') if not sctidre.match(l)])).rstrip()
     if opts.shorturi:
         target = fix_prefixes(target)
     open(opts.out, 'w').write(target)

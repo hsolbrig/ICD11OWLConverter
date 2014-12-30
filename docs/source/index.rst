@@ -106,18 +106,43 @@ Invocation
 
 :mod:`tagadder` Utility
 ------------------------
-Contents:
+The `tagadder` utility adds "SCT" and "ICD" tags to labels, which allows them to be more readily distinguished
+in ontology editing tools.
+
+Invocation
+``````````
+::
+
+   usage: tagadder.py [-h] [-f FORMAT] owlfile
+
+   Add a tag prefix to the labels in the supplied owl file
+
+   positional arguments:
+     owlfile               Input OWL file
+
+   optional arguments:
+     -h, --help            show this help message and exit
+     -f FORMAT, --format FORMAT
+                           File format
+
+
+
+:mod:`ConverterGateway` Module
+------------------------------
+The `ConverterGateway` module provides the a gateway to the Java SNOMED CT conversion functions.
+
+:mod:`SnomedCTParser` Java library
+----------------------------------
+This library is generated from the combination of
+`Daniel Karlsson's SNOMEDCTParser <https://github.com/danka74/SnomedCTParser>`_  and the `py4j python to java bridge <http://py4j.sourceforge.net/index.html>`_.
+
+It is invoked by::
+
+     java -jar SnomedCTParser.jar
+
 
 .. toctree::
    :maxdepth: 2
 
-.. automodule:: ICD11OWLConverter.cgtoowl
-.. automodule:: ICD11OWLConverter.tagadder
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 

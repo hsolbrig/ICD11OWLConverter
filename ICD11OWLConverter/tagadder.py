@@ -41,7 +41,7 @@ def main(args):
 
     optparser = argparse.ArgumentParser(description="Add a tag prefix to the labels in the supplied owl file")
     optparser.add_argument('owlfile', help="Input OWL file")
-    optparser.add_argument('-f', '-nformat', help="Input format", default="n3")
+    optparser.add_argument('-f', '--format', help="File format", default="n3")
 
     opts = optparser.parse_args(args)
 
@@ -55,7 +55,7 @@ def main(args):
                 g.remove([subj, RDFS.label, desc])
                 g.add([subj, RDFS.label, Literal(t + '  ' + str(desc))])
                 break
-    g.serialize(sys.stdout, format="n3")
+    g.serialize(sys.stdout, format=opts.format)
 
 
 if __name__ == '__main__':

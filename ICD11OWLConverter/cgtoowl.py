@@ -34,7 +34,7 @@ import io
 from rdflib import Graph, URIRef
 from functools import reduce
 
-from SCTConverterGateway import SCTConverterGateway
+from ConverterGateway import SCTConverterGateway
 
 # This is the annotation property that carries the compositional grammar definition
 icdf_comments = URIRef("http://who.int/field/Description.entity.en.Comments")

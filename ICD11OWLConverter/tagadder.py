@@ -34,13 +34,14 @@ from rdflib import Graph, RDFS, Literal
 labelmaps = [('http://snomed.info/id/', 'SCT'),
              ('http://id.who.int/icd/entity/', 'ICD')]
 
+
 def main(args):
-    """ Rewrite an OWL file adding a prefixes to the label
+    """ Rewrite an OWL file adding a prefixes to the SNOMED and ICD Labels
     """
 
     optparser = argparse.ArgumentParser(description="Add a tag prefix to the labels in the supplied owl file")
     optparser.add_argument('owlfile', help="Input OWL file")
-    optparser.add_argument('-f', '--format', help="Input format", default="n3")
+    optparser.add_argument('-f', '-nformat', help="Input format", default="n3")
 
     opts = optparser.parse_args(args)
 
@@ -52,9 +53,9 @@ def main(args):
         for p, t in labelmaps:
             if str(subj).startswith(p):
                 g.remove([subj, RDFS.label, desc])
-                g.add([subj, RDFS.label, Literal(t + '   ' + str(desc))])
+                g.add([subj, RDFS.label, Literal(t + '  ' + str(desc))])
                 break
-    g.serialize(opts.owlfile+".ttl", format="n3")
+    g.serialize(sys.stdout, format="n3")
 
 
 if __name__ == '__main__':

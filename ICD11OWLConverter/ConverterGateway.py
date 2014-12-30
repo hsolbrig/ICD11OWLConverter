@@ -32,7 +32,9 @@ from py4j.java_gateway import JavaGateway, GatewayClient, Py4JNetworkError
 
 
 def gwfunction(func):
-
+    """ Function wrapper that handles making sure the connection is live and active
+    :param func: Function to invoke when gateway is connected
+    """
     def wrapped_f(self, *args, **kwargs):
         if self.gatewayconnected():
             try:
@@ -78,5 +80,11 @@ class SCTConverterGateway(object):
 
     @gwfunction
     def parse(self, subj, primitive, cgstring):
+        """ Parse the supplied compositional grammar string into OWL
+        :param subj: subject URI
+        :param primitive: if True, cgstring will be interpreted as subClassOf.  If False, equivalentClass
+        :param cgstring: string to be interpreted
+        :return:  OWL equivalent or None if an error
+        """
         rval = self._parser.cgparse(subj, primitive, cgstring)
         return str(rval) if rval else None

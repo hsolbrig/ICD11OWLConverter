@@ -1,5 +1,10 @@
 from distutils.core import setup
 
+install_requires = [
+    "rdflib",
+    "py4j"
+]
+
 setup(
     name='ICD11OWLConverter',
     version='0.0.1',
@@ -8,5 +13,6 @@ setup(
     license='',
     author='Harold Solbrig',
     author_email='solbrig.harold@mayo.edu',
-    description='Front end for converting Compositional Grammar in ICD11 OWL constructs'
+    description='Front end for converting Compositional Grammar in ICD11 OWL constructs',
+    requires=install_requires
 )

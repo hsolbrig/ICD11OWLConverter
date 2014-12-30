@@ -27,4 +27,4 @@ Usage:
     **python3 ICD11OWLConverter/converter.py -o {output file} {ICD11 OWL file}**
     
 
-More documentation can be found at:
+More documentation can be found at

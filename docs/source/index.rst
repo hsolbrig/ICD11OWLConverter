@@ -102,6 +102,7 @@ Invocation
       -p PORT, --port PORT  SCT Converter gateway port
       -o OUT, --out OUT     Output file
       -s, --shorturi        Shorten URI's for readability
+      -r, --removesctid     Remove the SCT class declarations
 
 
 :mod:`tagadder` Utility

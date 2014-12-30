@@ -15,7 +15,7 @@ It also assumes that a py4j server image is running tha provides access to a mod
 
 1. A change to the SNOMEDCTOWLParser and SNOMEDCTParsorFactory to allow an external subject URI to be supplied.
 2. An additional package that creates a py4j front end process and initializes a CGToOWL instances
-3. A CGToOWL instances that exposes a parse method that takes a subject and a compositional grammar string and returns
+3. A CGToOWL instance that exposes a parse method that takes a subject and a compositional grammar string and returns
 the translation to OWL
 
 Usage:
@@ -27,5 +27,4 @@ Usage:
     **python3 ICD11OWLConverter/converter.py -o {output file} {ICD11 OWL file}**
     
 
-The output file will be a copy of the input file
-
+More documentation can be found at:

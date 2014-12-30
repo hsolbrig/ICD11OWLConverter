@@ -55,7 +55,8 @@ def main(args):
                 g.remove([subj, RDFS.label, desc])
                 g.add([subj, RDFS.label, Literal(t + '  ' + str(desc))])
                 break
-    g.serialize(sys.stdout, format=opts.format)
+    output = g.serialize(format=opts.format).decode('utf-8')
+    sys.stdout.write(output)
 
 
 if __name__ == '__main__':

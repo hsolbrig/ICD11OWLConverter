@@ -29,13 +29,14 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
 import cherrypy
 import configparser
 
 base = os.path.dirname(__file__)
+sys.path.append(os.path.join(base, 'ICD11OWLConverter'))
 config = configparser.ConfigParser()
 config.read('settings.conf')
-
 
 def http_methods_allowed(methods=None):
     """ Filter to pass the supplied methods unless overridden """

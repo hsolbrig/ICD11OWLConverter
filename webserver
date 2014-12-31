@@ -60,28 +60,30 @@ from server.RESTDispatcher import dispatcher
 
 conf = {'/': {
             'request.dispatch': dispatcher,
-            'tools.staticdir.root': os.path.join(base, "static")
+            'tools.staticdir.root': os.path.join(base, "static"),
+            'tools.encode.text_only': False,
+            'tools.encode.add_charset': True,
         },
         '/html': {
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'html'
         },
-        '/css': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': 'css'
-        },
-        '/fonts': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': 'fonts'
-        },
-        '/js': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': 'js'
-        },
-        '/xsd': {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': 'xsd'
-        },
+        # '/css': {
+        #     'tools.staticdir.on': True,
+        #     'tools.staticdir.dir': 'css'
+        # },
+        # '/fonts': {
+        #     'tools.staticdir.on': True,
+        #     'tools.staticdir.dir': 'fonts'
+        # },
+        # '/js': {
+        #     'tools.staticdir.on': True,
+        #     'tools.staticdir.dir': 'js'
+        # },
+        # '/xsd': {
+        #     'tools.staticdir.on': True,
+        #     'tools.staticdir.dir': 'xsd'
+        # },
         '/favicon.ico': {'tools.staticfile.on': True,
                          'tools.staticfile.filename': os.path.join(base, 'static', 'favicon.png')
         },

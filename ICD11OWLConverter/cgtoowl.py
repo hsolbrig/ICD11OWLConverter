@@ -31,7 +31,7 @@ import sys
 import argparse
 import re
 import io
-from rdflib import Graph, URIRef
+from rdflib import Graph, URIRef, ConjunctiveGraph
 
 from ConverterGateway import SCTConverterGateway
 from namespaces import namespaces
@@ -97,13 +97,19 @@ def parse_and_load(gw, subj, primitive, cgexpr, g):
 
 def serialize_graph(g, format="turtle", removesctid=False, shorturi=False):
     try:
-        target = g.serialize(format=format).decode('utf-8')
+        target = g.serialize(format="turtle").decode('utf-8')
     except Exception as e:
         return None, (400, e)
     if removesctid:
         target = ('\n'.join([l for l in target.split('\n') if not any(e.match(l) for e in remove_list)])).strip()
     if shorturi:
         target = fix_prefixes(target)
+    out_g = ConjunctiveGraph()
+    out_g.parse(io.StringIO(target), format="turtle")
+    try:
+        target = out_g.serialize(format=format).decode('utf-8')
+    except Exception as e:
+        return None, (400, e)
     return target
 
 

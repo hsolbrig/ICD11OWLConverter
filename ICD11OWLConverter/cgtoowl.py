@@ -32,24 +32,24 @@ import argparse
 import re
 import io
 from rdflib import Graph, URIRef
-from functools import reduce
 
 from ConverterGateway import SCTConverterGateway
+from namespaces import namespaces
 
 # This is the annotation property that carries the compositional grammar definition
-icdf_comments = URIRef("http://who.int/field/Description.entity.en.Comments")
+icdf_comments = URIRef(namespaces['icdf'] + "Description.entity.en.Comments")
 
 # CG definitions may include reference url/s following
 cgre1 = re.compile(r'.*Expression (\(pre-coordinated\)|\(post_coordinated\))\s*(.*?)http(s?)://.*$')
 cgre2 = re.compile(r'.*Expression (\(pre-coordinated\)|\(post_coordinated\))\s*(.*)')
-sctidre = re.compile(r'^<http://snomed.info/id/\d+> rdfs:label .*\.')
+
+# Expressions of lines to remove for remove sctid
+remove_list = [re.compile(r'^<' + namespaces['sctid'] + r'\d+> rdfs:label .*\.'),
+               re.compile(r'^<' + namespaces['sctid'] + r'\d+> a owl:Class \.$'),
+               re.compile(r'^<' + namespaces['sctid'] + r'\d+> a owl:ObjectProperty \.$')]
 
 # The SCTConverter builds an illegal base expression.  This fixes this
 owlbasere = re.compile(r'(^@base <.*)#>', flags=re.MULTILINE)
-
-# Prefix cleaner upperer -- see conversionbase.owl for prefixes
-prefixmaps = [(r'<http://snomed.info/id/(.*?)>', r'sctid:\1'),
-              (r'<http://id.who.int/icd/entity/(.*?)>', r'who:\1')]
 
 
 def fix_prefixes(owltext):
@@ -59,8 +59,52 @@ def fix_prefixes(owltext):
     """
     # This could be simplified if we could figure out how to get negative look-aheads to work...
     def fix_prefix(l):
-        return reduce(lambda text, e: re.sub(e[0], e[1], text, flags=re.DOTALL), prefixmaps, l)
+        for k, v in namespaces.items():
+            l = re.sub('<' + str(v) + r'(.*?)>', k + r':\1', l, flags=re.DOTALL)
+        return l
     return '\n'.join([l if l.startswith('@prefix') else fix_prefix(l) for l in owltext.split('\n')])
+
+def add_namespaces(g):
+    list(g.bind(k, v) for k, v in namespaces.items())
+    return g
+
+def map_namespace(subj):
+    if ':' in subj and not '//' in subj:
+        ns, n = subj.split(':', 1)
+        if ns in namespaces:
+            return namespaces[ns] + n
+        return subj
+    # Default is who
+    if re.match(r'^\d+$', subj):
+        return namespaces['who'] + subj
+    return subj
+
+def parse_and_load(gw, subj, primitive, cgexpr, g):
+    """ Parse the conceptual grammar expression for the supplied subject and, if successful, add
+    it to graph g.
+    :param gw: parser gateway
+    :param subj: subject of expression
+    :param primitive: true means subClassOf, false means equivalentClass
+    :param cgexpr: expression to parse
+    :param g: graph to add the result to
+    :return: true means success, false error
+    """
+    ttlresult = gw.parse(subj, primitive, cgexpr)
+    if ttlresult:
+        ttlresult = owlbasere.sub(r'\1>', ttlresult)
+        g.parse(io.StringIO(ttlresult), format='n3')
+    return bool(ttlresult)
+
+def serialize_graph(g, format="turtle", removesctid=False, shorturi=False):
+    try:
+        target = g.serialize(format=format).decode('utf-8')
+    except Exception as e:
+        return None, (400, e)
+    if removesctid:
+        target = ('\n'.join([l for l in target.split('\n') if not any(e.match(l) for e in remove_list)])).strip()
+    if shorturi:
+        target = fix_prefixes(target)
+    return target
 
 
 def main(args):
@@ -81,10 +125,9 @@ def main(args):
     gw = SCTConverterGateway(opts.port) if opts.port else SCTConverterGateway()
 
     g = Graph()
-    target_graph = Graph()
+    target_graph = add_namespaces(Graph())
     g.parse(opts.owlfile)
-    list(target_graph.add(t) for t in g.triples((None, None, None)))
-    # target_graph.parse('../data/conversionbase.owl', format='n3')
+    target_graph.parse(opts.owlfile)
 
     # Iterate over the comments with the compositional expressions
     for subj, desc in list(g.subject_objects(icdf_comments)):
@@ -96,21 +139,11 @@ def main(args):
             cgexpr = None
 
         if cgexpr:
-            # Convert the expressions into turtle
-            ttlresult = gw.parse(subj, not bool(opts.fullydefined), cgexpr)
-            if ttlresult:
-                ttlresult = owlbasere.sub(r'\1>', ttlresult)
-                target_graph.parse(io.StringIO(ttlresult), format='n3')
-            else:
+            if not parse_and_load(gw, subj, not bool(opts.fullydefined), cgexpr, target_graph):
                 print("Conversion error on %s (%s)" % (subj, cgexpr), file=sys.stderr)
         else:
             print("No conversion available for %s (%s)" % (subj, desc), file=sys.stderr)
-
-    target = target_graph.serialize(format='turtle').decode('utf-8')
-    if opts.removesctid:
-        target = ('\n'.join([l for l in target.split('\n') if not sctidre.match(l)])).rstrip()
-    if opts.shorturi:
-        target = fix_prefixes(target)
+    target = serialize_graph(target_graph, removesctid=opts.removesctid, shorturi=opts.shorturi)
     open(opts.out, 'w').write(target)
 
 

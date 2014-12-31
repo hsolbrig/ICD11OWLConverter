@@ -1,17 +1,21 @@
-@prefix ns1: <http://who.int/field/> .
+@prefix : <http://who.int/> .
+@prefix icdf: <http://who.int/field/> .
+@prefix icdp: <http://who.int/field/Description.entity.> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sctid: <http://snomed.info/id/> .
+@prefix who: <http://id.who.int/icd/entity/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://id.who.int/icd/entity/1097772105> a owl:Class ;
     rdfs:label "Rhabdomyosarcoma of cervix uteri"@en ;
-    ns1:Description.entity.en.Comments "Expression (post_coordinated) 302847003 | Rhabdomyosarcoma |: 363698007 | Finding site | = 71252005 | Cervix uteri structure | "@en ;
-    ns1:Description.entity.en.MapType "0/E"@en ;
-    ns1:Description.entity.en.definition """
+    icdf:Description.entity.en.Comments "Expression (post_coordinated) 302847003 | Rhabdomyosarcoma |: 363698007 | Finding site | = 71252005 | Cervix uteri structure | "@en ;
+    icdf:Description.entity.en.MapType "0/E"@en ;
+    icdf:Description.entity.en.definition """
 """@en ;
-    ns1:reviewed "false"@en ;
+    icdf:reviewed "false"@en ;
     rdfs:subClassOf <http://id.who.int/icd/entity/800945476> ;
     owl:equivalentClass [ a owl:Class ;
             owl:intersectionOf ( <http://snomed.info/id/302847003> [ a owl:Restriction ;

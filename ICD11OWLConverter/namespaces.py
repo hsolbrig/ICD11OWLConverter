@@ -26,42 +26,9 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
-import sys
-from os import listdir, remove
-from os.path import join
-import re
-import unittest
+from rdflib.namespace import Namespace, OWL
 
-from ICD11OWLConverter import cgtoowl
-
-
-class TestCGToOWL(unittest.TestCase):
-    def setUp(self):
-        self._tmpf = join(sys.path[0], 'tmp')
-
-    def test_files(self):
-        data = join(sys.path[0], '..', 'data')
-        for f in listdir(data):
-            if re.match(('test.*_in\.'), f):
-                inf = join(data, f)
-                outf = join(data, f.replace('_in.', '_out.'))
-                cgtoowl.main([inf, '-o' + self._tmpf])
-                self.assertEqual(open(outf).read(), open(self._tmpf).read())
-                outf = join(data, f.replace('_in.', '_out_f.'))
-                cgtoowl.main([inf, '-o' + self._tmpf, '-f'])
-                self.assertEqual(open(outf).read(), open(self._tmpf).read())
-                outf = join(data, f.replace('_in.', '_out_s.'))
-                cgtoowl.main([inf, '-o' + self._tmpf, '-s'])
-                self.assertEqual(open(outf).read(), open(self._tmpf).read())
-                outf = join(data, f.replace('_in.', '_out_r.'))
-                cgtoowl.main([inf, '-o' + self._tmpf, '-r'])
-                self.assertEqual(open(outf).read(), open(self._tmpf).read())
-                outf = join(data, f.replace('_in.', '_out_rs.'))
-                cgtoowl.main([inf, '-o' + self._tmpf, '-r', '-s'])
-                self.assertEqual(open(outf).read(), open(self._tmpf).read())
-                
-
-
-
-if __name__ == '__main__':
-    unittest.main()
+namespaces = {'who': Namespace("http://id.who.int/icd/entity/"),
+              'sctid': Namespace("http://snomed.info/id/"),
+              'icdf': Namespace("http://who.int/field/"),
+              'owl': OWL}

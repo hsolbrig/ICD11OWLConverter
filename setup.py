@@ -2,7 +2,9 @@ from distutils.core import setup
 
 install_requires = [
     "rdflib",
-    "py4j"
+    "py4j",
+    "cherrypy",
+    "routes"
 ]
 
 setup(

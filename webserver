@@ -1,0 +1,98 @@
+#!/usr/local/bin/python
+# -*- coding: utf-8 -*-
+# Copyright (c) 2014, Mayo Clinic
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+#     this list of conditions and the following disclaimer in the documentation
+#     and/or other materials provided with the distribution.
+#
+#     Neither the name of the <ORGANIZATION> nor the names of its contributors
+#     may be used to endorse or promote products derived from this software
+#     without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import os
+import cherrypy
+import configparser
+
+base = os.path.dirname(__file__)
+config = configparser.ConfigParser()
+config.read('settings.conf')
+
+
+def http_methods_allowed(methods=None):
+    """ Filter to pass the supplied methods unless overridden """
+    if not methods: methods = ['GET', 'HEAD']
+    method = cherrypy.request.method.upper()
+    if method not in methods:
+        cherrypy.response.headers['Allow'] = ", ".join(methods)
+        raise cherrypy.HTTPError(405)
+
+
+cherrypy.tools.allow = cherrypy.Tool('on_start_resource', http_methods_allowed)
+
+cherrypy.config.environments['development'] = {
+    'engine.autoreload.on': True,
+    'checker.on': True,
+    'tools.log_headers.on': True,
+    'request.show_tracebacks': True,
+    'request.show_mismatched_params': True,
+    'log.screen': True}
+
+from server.RESTDispatcher import dispatcher
+
+conf = {'/': {
+            'request.dispatch': dispatcher,
+            'tools.staticdir.root': os.path.join(base, "static")
+        },
+        '/html': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': 'html'
+        },
+        '/css': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': 'css'
+        },
+        '/fonts': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': 'fonts'
+        },
+        '/js': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': 'js'
+        },
+        '/xsd': {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': 'xsd'
+        },
+        '/favicon.ico': {'tools.staticfile.on': True,
+                         'tools.staticfile.filename': os.path.join(base, 'static', 'favicon.png')
+        },
+}
+
+
+def main():
+    cherrypy.config.update(os.path.join(base, 'server.conf'))
+    app = cherrypy.tree.mount(None, script_name='/icd11', config=conf)
+    cherrypy.quickstart(app)
+
+
+if __name__ == '__main__':
+    main()

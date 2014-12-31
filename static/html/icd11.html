@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Parse Compositional Grammar Expression</h1>
+<form name="in" method="POST" action="parse">
+
+    <b>Subject URI or ID</b>
+    <input type="text" name="subject" value="%(subject)s" size="40"/><br/>
+    <h2>Expression:</h2>
+    <textarea name="expr" rows=8 cols=120>%(expr)s</textarea></p>
+
+    <input type="checkbox" name="primitive"><b>Definition is primitive</b></input><br/>
+    <input type="checkbox" name="removesct"><b>Remove referenced class declarations</b><br/>
+    <input type="checkbox" name="shorturis"><b>Shorten URIs</b>
+    <br/>
+    <p>
+        <h3>Output Format:</h3>
+    %(formats)s
+    </p>
+    <p>
+        <input type="submit" value="Convert"/>
+    </p>
+</form>
+</body>
+</html>

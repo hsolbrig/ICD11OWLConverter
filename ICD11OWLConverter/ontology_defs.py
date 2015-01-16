@@ -26,21 +26,24 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
-from rdflib.namespace import Namespace, OWL, NamespaceManager
-from rdflib import Graph
+from rdflib import URIRef, RDF, RDFS, OWL, Literal
+from namespaces import ICDCG, ICDM, SCT, WHO
 
+sct_uri = URIRef("http://snomed.info/sct/900000000000207008")
+who_uri = URIRef("http://who.int/icd/11")
+# ICD Compositional grammar ontology
+ICDCG_uri = URIRef(ICDCG)
+cg_ontology = [(ICDCG_uri, RDF.type, OWL.Ontology),
+               (ICDCG_uri, RDFS.label, Literal("SNOMED CT Expressions for ICD-11")),
+               (ICDCG_uri, OWL.versionIRI, URIRef("http://who.int/icd/11/cg/version/20150115")),
+               (ICDCG_uri, OWL.versionInfo, Literal("20150115"))]
 
-WHO = Namespace("http://id.who.int/icd/entity/")
-SCT = Namespace("http://snomed.info/id/")
-ICDF = Namespace("http://who.int/field/")
-ICDM = Namespace("http://id.who.int/icd/map/")
-ICDCG = Namespace("http://who.int/icd/cg/")
-SCTCG = Namespace("http://snomed.info/cg/")
-
-namespaces = {'who': WHO,
-              'sctid': SCT,
-              'icdf': ICDF,
-              'icdm': ICDM,
-              'icdcg': ICDCG,
-              'sctcg': SCTCG,
-              'owl': OWL}
+# ICD Mapping Ontology
+ICDM_uri = URIRef(ICDM)
+map_ontology = [(ICDM_uri, RDF.type, OWL.Ontology),
+                (ICDM_uri, RDFS.label, Literal("ICD-11 to SNOMED CT and compositional grammar ontology")),
+                (ICDM_uri, OWL.versionIRI, URIRef("http://who.int/icd/11/map/version/20150115")),
+                (ICDM_uri, OWL.imports, sct_uri),
+                (ICDM_uri, OWL.imports, ICDCG_uri),
+                (ICDM_uri, OWL.imports, who_uri),
+                (ICDM_uri, OWL.versionInfo, Literal("20150115"))]

@@ -29,36 +29,52 @@
 
 import sys
 import argparse
-from rdflib import Graph, RDFS, Literal
+from rdflib import Graph, OWL, RDFS, Literal
 
-labelmaps = [('http://snomed.info/id/', 'SCT'),
-             ('http://id.who.int/icd/entity/', 'ICD'),
-             ('http://snomed.info/sep/', 'SEP'),
-             ('http://who.int/icd/11/xchapter/', 'XCH')]
+from ICD11OWLConverter.namespaces import namespaces
+from ontology_defs import map_ontology
 
 
 def main(args):
-    """ Rewrite an OWL file adding a prefixes to the SNOMED and ICD Labels
+    """ Create two files from the input file.  One with the ICD declarations and
+    a second with the equivalent and subclass declarations
     """
-
-    optparser = argparse.ArgumentParser(description="Add a tag prefix to the labels in the supplied owl file")
+    optparser = argparse.ArgumentParser(description="Split the input file into two output files -- one with pure ICD and a second with maps")
     optparser.add_argument('owlfile', help="Input OWL file")
     optparser.add_argument('-f', '--format', help="File format", default="n3")
+    optparser.add_argument('-of', '--outformat', help="Output file format(default is same as input)")
 
     opts = optparser.parse_args(args)
+    if not opts.outformat:
+        opts.outformat = opts.format
 
     g = Graph()
+    print("Reading " + opts.owlfile)
     g.parse(opts.owlfile, format=opts.format)
+    map_g = Graph()
+    list(map_g.bind(ns[0], ns[1]) for ns in g.namespaces() if ns[0])
+    list(map_g.add(e) for e in map_ontology)
 
-    # Iterate over the labels
-    for subj, desc in list(g.subject_objects(RDFS.label)):
-        for p, t in labelmaps:
-            if str(subj).startswith(p):
-                g.remove([subj, RDFS.label, desc])
-                g.add([subj, RDFS.label, Literal(t + '  ' + str(desc))])
-                break
-    output = g.serialize(format=opts.format).decode('utf-8')
-    sys.stdout.write(output)
+    # Iterate over the assertions
+    strwho = str(namespaces['who'])
+    strsct = str(namespaces['sctid'])
+    for s, o in g[:OWL.equivalentClass]:
+        # TODO: find the official way of determining namespaces
+        if (str(s).startswith(strwho) and str(o).startswith(strsct)) or \
+                (str(s).startswith(strsct) and str(o).startswith(strwho)):
+            map_g.add((s, OWL.equivalentClass, o))
+            g.remove((s, OWL.equivalentClass, o))
+
+    whostr = str(namespaces['who'])
+    for s, o in list(g[:RDFS.label]):
+        if str(s).startswith(whostr):
+            g.add((s, RDFS.label, Literal('ICD  ' + str(o))))
+            g.remove((s, RDFS.label, o))
+
+    open(opts.owlfile + 'nomaps.ttl', 'wb').write(g.serialize(format=opts.outformat))
+    print(opts.owlfile + 'nomaps.ttl written')
+    open(opts.owlfile + 'maps.ttl', 'wb').write(map_g.serialize(format=opts.outformat))
+    print(opts.owlfile + 'maps.ttl written')
 
 
 if __name__ == '__main__':

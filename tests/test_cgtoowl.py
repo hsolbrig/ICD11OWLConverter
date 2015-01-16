@@ -59,6 +59,8 @@ class TestCGToOWL(unittest.TestCase):
                 outf = join(data, f.replace('_in.', '_out_rs.'))
                 cgtoowl.main([inf, '-o' + self._tmpf, '-r', '-s'])
                 self.assertEqual(open(outf).read(), open(self._tmpf).read())
+                remove(self._tmpf)
+
                 
 
 

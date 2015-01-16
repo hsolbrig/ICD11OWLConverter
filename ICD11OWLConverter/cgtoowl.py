@@ -68,6 +68,7 @@ def add_namespaces(g):
     list(g.bind(k, v) for k, v in namespaces.items())
     return g
 
+
 def map_namespace(subj):
     if ':' in subj and not '//' in subj:
         ns, n = subj.split(':', 1)
@@ -78,6 +79,7 @@ def map_namespace(subj):
     if re.match(r'^\d+$', subj):
         return namespaces['who'] + subj
     return subj
+
 
 def parse_and_load(gw, subj, primitive, cgexpr, g):
     """ Parse the conceptual grammar expression for the supplied subject and, if successful, add

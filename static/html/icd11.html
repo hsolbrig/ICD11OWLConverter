@@ -1,5 +1,19 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <script type="text/javascript">
+        (function () {
+            var protocol = location.href.substr(0, location.href.indexOf("://"));
+            var restOfUrl = location.href.substr(location.href.indexOf("://") + "://".length);
+            if (restOfUrl.match(/[^\/]\?/)) {
+                location.href = protocol + '://' + restOfUrl.replace(/'\?'/, '/?')
+            }
+            else if (!restOfUrl.match(/(\/$)/)) {
+                location.href = protocol + "://" + restOfUrl + '/';
+            }
+        })();
+    </script>
+</head>
 <body>
 <h1>Parse Compositional Grammar Expression</h1>
 <form name="in" method="POST" action="parse">

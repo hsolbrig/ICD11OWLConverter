@@ -5,10 +5,12 @@
         (function () {
             var protocol = location.href.substr(0, location.href.indexOf("://"));
             var restOfUrl = location.href.substr(location.href.indexOf("://") + "://".length);
-            if (restOfUrl.match(/[^/]\?/)) {
-                location.href = protocol + '://' + restOfUrl.replace(/\?/, '/?')
+            if (restOfUrl.match(/\?/)) {
+                if (restOfUrl.match(/[^/]\?/)) {
+                    location.href = protocol + '://' + restOfUrl.replace(/\?/, '/?')
+                }
             }
-            else if (!restOfUrl.match(/(\/$)/)) {
+            else if (!restOfUrl.match(/\/$/)) {
                 location.href = protocol + "://" + restOfUrl + '/';
             }
         })();
